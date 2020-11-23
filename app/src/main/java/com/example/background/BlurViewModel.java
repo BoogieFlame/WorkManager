@@ -32,6 +32,7 @@ import com.example.background.workers.BlurWorker;
 import com.example.background.workers.CleanupWorker;
 import com.example.background.workers.SaveImageToFileWorker;
 import java.util.List;
+import androidx.work.Constraints;
 
 import java.util.List;
 
@@ -70,6 +71,11 @@ public class BlurViewModel extends AndroidViewModel {
     }
 
     void applyBlur(int blurLevel) {
+        // In the applyBlur method
+        // Create charging constraint
+        Constraints constraints = new Constraints.Builder()
+                .setRequiresCharging(true)
+                .build();
         // Add WorkRequest to Cleanup temporary images
         WorkContinuation continuation = mWorkManager
                 .beginUniqueWork(IMAGE_MANIPULATION_WORK_NAME,
@@ -90,13 +96,14 @@ public class BlurViewModel extends AndroidViewModel {
         }
         // Add WorkRequest to save the image to the filesystem
         OneTimeWorkRequest save = new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
+                .setConstraints(constraints)// This add the constrains
                 .addTag(TAG_OUTPUT) // This adds the tag
                 .build();
         continuation = continuation.then(save);
         // Actually start the work
         continuation.enqueue();
     }
-    
+
     private Uri uriOrNull(String uriString) {
         if (!TextUtils.isEmpty(uriString)) {
             return Uri.parse(uriString);
