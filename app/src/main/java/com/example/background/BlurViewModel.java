@@ -18,10 +18,12 @@ package com.example.background;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkContinuation;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import android.app.Application;
 import android.net.Uri;
@@ -29,6 +31,9 @@ import android.text.TextUtils;
 import com.example.background.workers.BlurWorker;
 import com.example.background.workers.CleanupWorker;
 import com.example.background.workers.SaveImageToFileWorker;
+import java.util.List;
+
+import java.util.List;
 
 import static com.example.background.Constants.KEY_IMAGE_URI;
 import static com.example.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
@@ -37,6 +42,16 @@ import static com.example.background.Constants.TAG_OUTPUT;
 public class BlurViewModel extends AndroidViewModel {
 
     private Uri mImageUri;
+    private LiveData<List<WorkInfo>> mSavedWorkInfo;
+    private WorkManager mWorkManager;
+    // BlurViewModel constructor
+    public  BlurViewModel(@NonNull Application application) {
+        super(application);
+        mWorkManager = WorkManager.getInstance(application);
+        mSavedWorkInfo = mWorkManager.getWorkInfosByTagLiveData(TAG_OUTPUT);
+    }
+
+    LiveData<List<WorkInfo>> getOutputWorkingInfo() {return mSavedWorkInfo;}
 
     private Data createInputDataForUri() {
         Data.Builder builder = new Data.Builder();
@@ -44,14 +59,6 @@ public class BlurViewModel extends AndroidViewModel {
             builder.putString(KEY_IMAGE_URI, mImageUri.toString());
         }
         return  builder.build();
-    }
-
-    private WorkManager mWorkManager;
-    // BlurViewModel constructor
-    public  BlurViewModel(@NonNull Application application) {
-        super(application);
-        mWorkManager = WorkManager.getInstance(application);
-        //...rest of the constructor
     }
 
     void applyBlur(int blurLevel) {
