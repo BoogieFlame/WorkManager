@@ -43,6 +43,14 @@ public class BlurViewModel extends AndroidViewModel {
 
     private Uri mImageUri;
     private LiveData<List<WorkInfo>> mSavedWorkInfo;
+    // New instance variable for the WorkInfo
+    private Uri mOutputUri;
+    // Add a getter and setter for mOutputUri
+    void setOutputUri(String outputImageUri) {
+        mOutputUri = uriOrNull(outputImageUri);
+    }
+    Uri getOutputUri() { return mOutputUri; }
+
     private WorkManager mWorkManager;
     // BlurViewModel constructor
     public  BlurViewModel(@NonNull Application application) {
@@ -88,7 +96,7 @@ public class BlurViewModel extends AndroidViewModel {
         // Actually start the work
         continuation.enqueue();
     }
-
+    
     private Uri uriOrNull(String uriString) {
         if (!TextUtils.isEmpty(uriString)) {
             return Uri.parse(uriString);
