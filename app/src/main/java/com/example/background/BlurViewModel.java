@@ -119,4 +119,10 @@ public class BlurViewModel extends AndroidViewModel {
         return mImageUri;
     }
 
+    /**
+     * Cancel work using the work's unique name
+     */
+    void cancelWork() {
+        mWorkManager.cancelUniqueWork(IMAGE_MANIPULATION_WORK_NAME);
+    }
 }

@@ -86,6 +86,9 @@ public class BlurActivity extends AppCompatActivity {
                 }
             });
         });
+        // In onCreate()
+        // Hookup the Cancel button
+        binding.cancelButton.setOnClickListener(view -> mViewModel.cancelWork());
     }
 
     /**
