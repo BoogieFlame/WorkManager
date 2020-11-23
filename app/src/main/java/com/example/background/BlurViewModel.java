@@ -32,6 +32,7 @@ import com.example.background.workers.SaveImageToFileWorker;
 
 import static com.example.background.Constants.KEY_IMAGE_URI;
 import static com.example.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
+import static com.example.background.Constants.TAG_OUTPUT;
 
 public class BlurViewModel extends AndroidViewModel {
 
@@ -73,9 +74,9 @@ public class BlurViewModel extends AndroidViewModel {
             continuation = continuation.then(blurBuilder.build());
         }
         // Add WorkRequest to save the image to the filesystem
-        OneTimeWorkRequest save =
-                new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
-                        .build();
+        OneTimeWorkRequest save = new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
+                .addTag(TAG_OUTPUT) // This adds the tag
+                .build();
         continuation = continuation.then(save);
         // Actually start the work
         continuation.enqueue();
