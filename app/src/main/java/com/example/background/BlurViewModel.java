@@ -56,10 +56,16 @@ public class BlurViewModel extends AndroidViewModel {
         WorkContinuation continuation =
                 mWorkManager.beginWith(OneTimeWorkRequest.from(CleanupWorker.class));
         // Add WorkRequest to blur the image
-        OneTimeWorkRequest blurRequest = new OneTimeWorkRequest.Builder(BlurWorker.class)
-                .setInputData(createInputDataForUri())
-                .build();
-        continuation = continuation.then(blurRequest);
+        for (int i = 0; i < blurLevel; i++) {
+            OneTimeWorkRequest.Builder blurBuilder =
+                    new OneTimeWorkRequest.Builder(BlurWorker.class);
+//                        .setInputData(createInputDataForUri())
+//                        .build();
+            if (i == 0) {
+                blurBuilder.setInputData(createInputDataForUri());
+            }
+            continuation = continuation.then(blurBuilder.build());
+        }
         // Add WorkRequest to save the image to the filesystem
         OneTimeWorkRequest save =
                 new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
