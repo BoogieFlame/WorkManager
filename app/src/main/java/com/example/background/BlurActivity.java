@@ -19,12 +19,15 @@ package com.example.background;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import com.bumptech.glide.Glide;
 import com.example.background.databinding.ActivityBlurBinding;
+
+import androidx.work.Data;
 import androidx.work.WorkInfo;
 
 public class BlurActivity extends AppCompatActivity {
@@ -53,19 +56,25 @@ public class BlurActivity extends AppCompatActivity {
         // Setup blur image file button
         binding.goButton.setOnClickListener(view -> mViewModel.applyBlur(getBlurLevel()));
         // Show work status, added in onCreate()
-        mViewModel.getOutputWorkingInfo().observe(this, listOfWorkInfos -> {
-            // If there are no matching work info, do nothing
-            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+        mViewModel.getOutputWorkingInfo().observe(this, listOfWorkInfo -> {
+            // If there are no matching work Info, do nothing
+            if (listOfWorkInfo == null || listOfWorkInfo.isEmpty()) {
                 return;
             }
             // We only care about the first output status.
             // Every continuation has only one worker tagged TAG_OUTPUT
-            WorkInfo workInfo = listOfWorkInfos.get(0);
+            WorkInfo workInfo = listOfWorkInfo.get(0);
             boolean finished = workInfo.getState().isFinished();
             if (!finished) {
                 showWorkInProgress();
             } else {
                 showWorkFinished();
+            }
+            Data outputData = workInfo.getOutputData();
+            String outputImageUri = outputData.getString(Constants.KEY_IMAGE_URI);
+            if (!TextUtils.isEmpty(outputImageUri)) {
+                mViewModel.setOutputUri(outputImageUri);
+                binding.seeFileButton.setVisibility(View.VISIBLE);
             }
             binding.seeFileButton.setOnClickListener(view -> {
                 Uri currentUri = mViewModel.getOutputUri();
