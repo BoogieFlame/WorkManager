@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import com.bumptech.glide.Glide;
 import com.example.background.databinding.ActivityBlurBinding;
+import androidx.work.WorkInfo;
 
 public class BlurActivity extends AppCompatActivity {
 
@@ -50,6 +51,22 @@ public class BlurActivity extends AppCompatActivity {
 
         // Setup blur image file button
         binding.goButton.setOnClickListener(view -> mViewModel.applyBlur(getBlurLevel()));
+        // Show work status, added in onCreate()
+        mViewModel.getOutputWorkingInfo().observe(this, listOfWorkInfos -> {
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+            // We only care about the first output status.
+            // Every continuation has only one worker tagged TAG_OUTPUT
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+            boolean finished = workInfo.getState().isFinished();
+            if (!finished) {
+                showWorkInProgress();
+            } else {
+                showWorkFinished();
+            }
+        });
     }
 
     /**
