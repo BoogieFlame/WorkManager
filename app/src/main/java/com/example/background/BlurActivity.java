@@ -17,6 +17,7 @@
 package com.example.background;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.Nullable;
@@ -66,6 +67,15 @@ public class BlurActivity extends AppCompatActivity {
             } else {
                 showWorkFinished();
             }
+            binding.seeFileButton.setOnClickListener(view -> {
+                Uri currentUri = mViewModel.getOutputUri();
+                if (currentUri != null) {
+                    Intent actionView = new Intent(Intent.ACTION_VIEW, currentUri);
+                    if (actionView.resolveActivity(getPackageManager()) != null) {
+                        startActivity(actionView);
+                    }
+                }
+            });
         });
     }
 
