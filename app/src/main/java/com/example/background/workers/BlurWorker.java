@@ -24,8 +24,10 @@ public class BlurWorker extends Worker {
     private static final String TAG = BlurWorker.class.getSimpleName();
     @NonNull
     @Override
-    public Result doWork() {
+    public Worker.Result doWork() {
         Context applicationContext = getApplicationContext();
+        WorkerUtils.makeStatusNotification("Bluring image",applicationContext);
+        WorkerUtils.sleep();
         String resourceUri = getInputData().getString(KEY_IMAGE_URI);
         try {
 //            Bitmap picture = BitmapFactory.decodeResource(
@@ -45,9 +47,8 @@ public class BlurWorker extends Worker {
 
             // Write bitmap to a temp file
             Uri outputUri = WorkerUtils.writeBitmapToFile(applicationContext, output);
-            WorkerUtils.makeStatusNotification("Output is "
-                    + outputUri.toString(), applicationContext);
-
+//            outputUri.toWorkerUtils.makeStatusNotification("Output is "
+//                    + String(), applicationContext);
             // If there were no errors, return SUCCESS
 //            return Result.success();
             Data outputData = new Data.Builder()
@@ -55,11 +56,11 @@ public class BlurWorker extends Worker {
                     .build();
             return Result.success(outputData);
         }
+
         catch (Throwable throwable) {
             // Technically WorkManager will return Result.failure()
             // but it's best to be explicit about it.
             // Thus if there were errors, we're return FAILURE
-
             Log.e(TAG, "Error applying blur", throwable);
             return Result.failure();
         }
